@@ -68,7 +68,7 @@ export const Header = () => {
                   <NavDropdown.Item href="profile">Perfil</NavDropdown.Item>
                   <NavDropdown.Item href="dashboard">Admin</NavDropdown.Item>
                   <NavDropdown.Divider />
-                  <NavDropdown.Item onClick={() => logMeOut()}>Iniciar sesión</NavDropdown.Item>
+                  <NavDropdown.Item onClick={() => logMeOut()}>Cerrar sesión</NavDropdown.Item>
                 </>
               ) : decoded.userRole === "dietitian" ? (
                   <>
