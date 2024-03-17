@@ -1,0 +1,10 @@
+.offcanvas{
+    z-index:9999;
+}
+
+.appointments-btn-container{
+    text-align: right;
+    border-bottom: 1px solid #a19f9f;
+    padding-bottom:0;
+    margin-bottom: 2rem;
+}

@@ -1,0 +1,34 @@
+.profileDesign {
+    height: 100vh;
+    width: 100vw;
+    padding-top: 3rem;
+}
+
+.miDiv{
+    width:50%;
+    margin:0 auto;
+}
+
+input{
+    width:60%;
+    display: block;
+    background-color: transparent;
+    border:none;
+    border-bottom:1px solid #121212;
+    margin:0 auto 1rem auto;
+}
+
+button {
+    margin:2rem auto;
+    width: 60%;
+}
+
+
+nav.navbar{
+    position: relative!important;
+}
+
+#importante {
+    font-size:xx-large;
+    color: orange
+}
