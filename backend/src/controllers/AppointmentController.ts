@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
+import { LessThanOrEqual, MoreThanOrEqual } from "typeorm";
+import { DaysOfWeek } from "../constants/BusinessHours";
 import { AppDataSource } from "../database/data-source";
 import { Appointment } from "../models/Appointment";
 import { BusinessHour } from "../models/BusinessHour";
+import { Center } from "../models/Center";
+import { Dietitian } from "../models/Dietitian";
 import { User } from "../models/User";
 import { Controller } from "./Controller";
 
@@ -15,15 +19,12 @@ export class AppointmentController implements Controller {
          let { page, skip } = req.query;
 
          let currentPage = page ? +page : 1;
-         let itemsPerPage = skip ? +skip : 10;
+         let itemsPerPage = skip ? +skip : 20;
 
          const [allAppointments, count] = await appointmentRepository.findAndCount({
             skip: (currentPage - 1) * itemsPerPage,
             take: itemsPerPage,
-            relations: {
-               dietitian: true,
-               client: true
-            },
+            relations: ['client','client.user','dietitian','dietitian.user', 'service', 'center'],
             select: {
                id: true,
                appointment_date: true
@@ -53,10 +54,7 @@ export class AppointmentController implements Controller {
             where: {
                id: id
             },
-            relations: {
-               dietitian: true,
-               client: true
-            }
+            relations: ['dietitian','dietitian.user', 'client','client.user', 'center', 'service']
          });
 
          if (!appointment) {
@@ -78,15 +76,31 @@ export class AppointmentController implements Controller {
          const data = req.body;
 
          const appointmentRepository = AppDataSource.getRepository(Appointment);
+         const centerRepository = AppDataSource.getRepository(Center);
          const userRepository = AppDataSource.getRepository(User);
+         const dietitianRepository = AppDataSource.getRepository(Dietitian);
          const businessHourRepository = AppDataSource.getRepository(BusinessHour);
 
          data.appointment_date = new Date(data.appointment_date);
 
+         //Se obtiene el Center usando el data.center (id de centro) recibido en la petición
+         data.center = await centerRepository.findOneBy({
+            id: data.center
+         }) as Center;
 
          const appointmentTime = data.appointment_date.getHours() + ":" + data.appointment_date.getMinutes() + ":00";
 
-         const businessHours = await businessHourRepository.find
+         const businessHours = await businessHourRepository.find({
+            relations: {
+               center: true
+            },
+            where: {
+               center: data.center,
+               openingTime: LessThanOrEqual(appointmentTime),
+               closingTime: MoreThanOrEqual(appointmentTime),
+               dayOfWeek: DaysOfWeek[data.appointment_date.getDay()]
+            }
+         }) as BusinessHour[];
 
          if (businessHours.length <= 0) {
             return res.status(400).json({
@@ -94,13 +108,16 @@ export class AppointmentController implements Controller {
             });
          }
          
-         data.clientUser = await userRepository.findOneBy({
-            id: data.clientUser
+         data.clientUser = await userRepository.findOne({
+            where: {id: data.clientUser},
+            relations: ['client']
          }) as User;
 
-         data.dietitian = await userRepository.findOneBy({
-            id: data.dietitian
-         }) as User;
+         data.client = data.clientUser.client
+
+         data.dietitian = await dietitianRepository.findOneBy({
+            id: data.dietitian_id
+         }) as Dietitian;
 
          //Se verifica si el dietitian recibido tiene alguna cita para la fecha recibida
          const dietitianAvailable = await appointmentRepository.find({
@@ -124,7 +141,7 @@ export class AppointmentController implements Controller {
          res.status(201).json(newAppointment);
       } catch (error) {
          res.status(500).json({
-            message: "Error while creating appointment",
+            message: "Error while creating appointment" + error,
          });
       }
    }
@@ -135,8 +152,9 @@ export class AppointmentController implements Controller {
          const data = req.body;
 
          const appointmentRepository = AppDataSource.getRepository(Appointment);
-         const userRepository = AppDataSource.getRepository(User);
          const businessHourRepository = AppDataSource.getRepository(BusinessHour);
+         const dietitianRepository = AppDataSource.getRepository(Dietitian);
+         const centerRepository = AppDataSource.getRepository(Center);
 
          const appointment = await appointmentRepository.findOneBy({
             id: id,
@@ -148,13 +166,29 @@ export class AppointmentController implements Controller {
             });
          }
 
+
+         //Se obtiene el Center usando el data.center (id de centro) recibido en la petición
+         data.center = await centerRepository.findOneBy({
+            id: data.center
+         }) as Center;
+
          if (data.appointment_date) {
             data.appointment_date = new Date(data.appointment_date);
           }
 
-         const appointmentTime = data.appointment_date.getHours() + ":" + data.appointment_date.getMinutes() + ":00";
+          const appointmentTime = data.appointment_date.getHours() + ":" + data.appointment_date.getMinutes() + ":00";
 
-         const businessHours = await businessHourRepository.find
+          const businessHours = await businessHourRepository.find({
+             relations: {
+                center: true
+             },
+             where: {
+                center: data.center,
+                openingTime: LessThanOrEqual(appointmentTime),
+                closingTime: MoreThanOrEqual(appointmentTime),
+                dayOfWeek: DaysOfWeek[data.appointment_date.getDay()]
+             }
+          }) as BusinessHour[];
 
          if (businessHours.length <= 0) {
             return res.status(400).json({
@@ -162,14 +196,9 @@ export class AppointmentController implements Controller {
             });
          }
          
-         data.clientUser = await userRepository.findOneBy({
-            id: data.clientUser
-         }) as User;
-
-         data.dietitian = await userRepository.findOneBy({
-            id: data.dietitian
-         }) as User;
-
+         data.dietitian = await dietitianRepository.findOneBy({
+            id: data.dietitian_id
+         }) as Dietitian;
 
          //Se verifica si el dietitian recibido tiene alguna cita para la fecha recibida
          const dietitianAvailable = await appointmentRepository.find({
@@ -196,7 +225,7 @@ export class AppointmentController implements Controller {
          });
       } catch (error) {
          res.status(500).json({
-            message: "Error while updating appointment",
+            message: "Error while updating appointment" + error,
          });
       }
    }

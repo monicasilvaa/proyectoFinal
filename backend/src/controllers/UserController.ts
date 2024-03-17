@@ -25,10 +25,12 @@ export class UserController implements Controller {
          const [allUsers, count] = await userRepository.findAndCount({
             skip: (currentPage - 1) * itemsPerPage,
             take: itemsPerPage,
+            relations: ['role'],
             select: {
                username: true,
                email: true,
                id: true,
+               register_date: true
             },
          });
          res.status(200).json({
@@ -84,8 +86,9 @@ export class UserController implements Controller {
          const id = +req.params.id;
 
          const userRepository = AppDataSource.getRepository(User);
-         const user = await userRepository.findOneBy({
-            id: id,
+         const user = await userRepository.findOne({
+            where: {id: id},
+            relations: ['client']
          });
 
          if (!user) {
@@ -106,23 +109,23 @@ export class UserController implements Controller {
 
    async getDietitianList(req: Request, res: Response): Promise<void | Response<any>> {
       try {
-         const userRepository = AppDataSource.getRepository(User);
+         const dietitianRepository = AppDataSource.getRepository(Dietitian);
 
          let { page, skip } = req.query;
 
          let currentPage = page ? +page : 1;
          let itemsPerPage = skip ? +skip : 10;
 
-         const [allDietitians, count] = await userRepository.findAndCount({
+         const [allDietitians, count] = await dietitianRepository.findAndCount({
             skip: (currentPage - 1) * itemsPerPage,
             take: itemsPerPage,
             select: {
-               username: true,
-               email: true,
+               user: {username: true, email: true, first_name: true, last_name: true},
                id: true,
             },
+            relations: ['user'],
             where: {
-               role: UserRoles.DIETITIAN
+               user:{role: UserRoles.DIETITIAN}
             },
          });
          res.status(200).json({
@@ -165,9 +168,7 @@ export class UserController implements Controller {
        where: {
          id: centerId
        },
-       relations: {
-         dietitians: true
-       }
+       relations: ['dietitians', 'dietitians.user']
      });
 
      if (!center) {
@@ -179,7 +180,7 @@ export class UserController implements Controller {
      res.status(200).json(center.dietitians);
    } catch (error) {
      res.status(500).json({
-       message: "Error while getting dietitians by center",
+       message: "Error while getting dietitians by center" + error,
      });
    }
  }
@@ -220,9 +221,7 @@ export class UserController implements Controller {
 
          const userRepository = AppDataSource.getRepository(User);
          
-         const user = await userRepository.findOneBy({
-            id: id,
-         });
+         let user = await userRepository.findOne({where: {id: id}, relations: ["client", "dietitian"] });
 
          if (!user) {
             return res.status(404).json({
@@ -230,14 +229,34 @@ export class UserController implements Controller {
             });
          }
 
-         await userRepository.update({ id: id }, data);
+         Object.assign(user, data);
+        
+         if(data.client && !user.client) {
+            user.client = new Client();
+            user.client.user = user;
+         }
+         else if(data.dietitian && !user.dietitian) {
+            user.dietitian = new Dietitian();
+            user.dietitian.user = user;
+         }
+
+         if(user.client) {
+            Object.assign(user.client, data.client);
+            await userRepository.manager.save(user.client);
+         }
+         else if(user.dietitian) {
+            Object.assign(user.dietitian, data.dietitian);
+            await userRepository.manager.save(user.dietitian);
+         }
+
+         await userRepository.save(user);
 
          res.status(202).json({
             message: "User updated successfully",
          });
       } catch (error) {
          res.status(500).json({
-            message: "Error while updating user",
+            message: "Error while updating user" + error,
          });
       }
    }
@@ -304,11 +323,9 @@ export class UserController implements Controller {
          const clientRepository = AppDataSource.getRepository(Client);
          const client = await clientRepository.findOne({
             where: {
-               id: userId
+               user: {id: userId}
             },
-            relations: {
-               appointments: true
-            }
+            relations: ['appointments','appointments.service', 'appointments.center', 'appointments.dietitian', 'appointments.dietitian.user', 'user']
          });
 
          if (!client) {

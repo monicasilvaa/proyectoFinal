@@ -26,8 +26,9 @@ import { Role } from "./Role";
     @Column()
     phone!: string;
   
-    @Column()
+    @Column({ type: 'date' })
     birthday_date!: Date;
+
   
     @CreateDateColumn({
       type: "timestamp",

@@ -20,7 +20,7 @@ export class Center {
 
     @ManyToMany(() => Dietitian, (dietitian) => dietitian.centers)
     @JoinTable({ 
-      name: 'dietitiansCenters',
+      name: 'dietitianCenters',
       joinColumn: { name: "center_id"},
       inverseJoinColumn: { name: "dietitian_id" },
    })

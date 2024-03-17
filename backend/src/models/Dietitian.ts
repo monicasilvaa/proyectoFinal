@@ -23,7 +23,7 @@ import { User } from "./User";
 
     @ManyToMany(() => Center, (center) => center.dietitians)
     @JoinTable({ 
-        name: 'dietitiansCenters',
+        name: 'dietitianCenters',
         joinColumn: { name: "dietitian_id"},
         inverseJoinColumn: { name: "center_id" },
     })

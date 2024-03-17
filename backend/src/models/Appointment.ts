@@ -10,7 +10,7 @@ export class Appointment {
   @PrimaryGeneratedColumn()
   id?: number;
 
-  @Column({ type: "timestamp" })
+  @Column({ type: "date" })
   appointment_date!: Date;
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })

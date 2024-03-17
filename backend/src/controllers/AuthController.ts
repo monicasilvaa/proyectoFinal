@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
-import {CreateClientRequestBody,LoginUserRequestBody,TokenData} from "../types/types";
-import { User } from "../models/User";
 import bcrypt from "bcrypt";
-import { UserRoles } from "../constants/UserRoles";
-import { AppDataSource } from "../database/data-source";
+import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
+import { UserRoles } from "../constants/UserRoles";
+import { AppDataSource } from "../database/data-source";
+import { User } from "../models/User";
+import { CreateClientRequestBody, LoginUserRequestBody, TokenData } from "../types/types";
 
 // -----------------------------------------------------------------------------
 
@@ -28,17 +28,19 @@ export class AuthController {
             first_name,
             last_name,
             birthday_date,
-            phone,
+            phone, 
             role: UserRoles.CLIENT,
          };
          await userRepository.save(newUser);
+      
+
 
          res.status(StatusCodes.CREATED).json({
             message: "Client created successfully",
          });
       } catch (error) {
          res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-            message: "Error while creating client",
+            message: "Error while creating client" + error,
          });
       }
    }
