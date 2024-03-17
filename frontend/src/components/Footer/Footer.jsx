@@ -1,0 +1,17 @@
+export const Footer = () =>{
+
+
+
+
+
+
+
+
+    return (
+        <>
+        
+        
+        
+        </>
+    )
+}
