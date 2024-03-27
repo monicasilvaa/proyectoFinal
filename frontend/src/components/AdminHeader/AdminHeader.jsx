@@ -1,5 +1,4 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
@@ -8,44 +7,28 @@ import Offcanvas from 'react-bootstrap/Offcanvas';
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout, userData } from "../../pages/userSlice";
-import { getUserById } from "../../services/apiCalls";
-import "./Header.css";
+import "./AdminHeader.css";
 
-export const Header = () => {
+export const AdminHeader = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch()
   const userRdxData = useSelector(userData)
-  const [clientId, setClientId] = useState(false);
 
-  const token = userRdxData.credentials.token
-  const decoded = userRdxData.credentials.userData
-
-  useEffect(() => {
-    if(decoded)
-    {
-      getUserById(token, decoded.userId)
-      .then((res) => {
-        if(res.client){
-          setClientId(res.client.id);
-        }
-      });  
-    } 
-    
-  })
+  const token = userRdxData?.credentials?.token
+  const decoded = userRdxData?.credentials?.userData
+  const userRole = userRdxData?.credentials?.userData?.userRole
 
   const logMeOut = () => {
     dispatch(logout({credentials: {}}))
-    setTimeout(() => {
-      navigate("/login");
-    },1500);
+    
   };
 
   return (
     <>
-      <Navbar fixed="top" key="sm" expand="sm" className="bg-body-tertiary mb-3">
+      <Navbar sticky="top" key="sm" expand="sm" className="bg-body-tertiary mb-3">
           <Container>
             <Navbar.Toggle aria-controls="navbarMobile" className="me-auto ms-0 w-auto"/>
-            <Navbar.Brand className="me-auto" href="#">Mónica Silva</Navbar.Brand>
+            <Navbar.Brand className="me-auto" href="#">Admin</Navbar.Brand>
             <Navbar.Offcanvas
               id="navbarMobile"
               aria-labelledby="navbarMobileLabel"
@@ -53,16 +36,22 @@ export const Header = () => {
             >
               <Offcanvas.Header closeButton>
                 <Offcanvas.Title id="navbarMobileLabel">
-                  Mónica Silva
+                  Admin
                 </Offcanvas.Title>
               </Offcanvas.Header>
               <Offcanvas.Body>
                 <Nav navbarScroll className="justify-content-center flex-grow-1 pe-3">
-                  <Nav.Link href="/">Home</Nav.Link>
-                  <Nav.Link href="/#dietistas">Diestistas</Nav.Link>
-                  <Nav.Link href="/#centros">Centros</Nav.Link>
+                  {userRole == "superadmin" ?
+                  <>
+                    <Nav.Link href="/admin/users">Usuarios</Nav.Link>
+                    <Nav.Link href="/admin/appointments">Citas</Nav.Link>
+                  </>
+                  : null}
+                  {userRole == "dietitian" ?
+                      <Nav.Link href="/admin/clients">Clientes</Nav.Link>
+                    : null}
                 </Nav>
-                <Nav className="justify-content-end">
+                <Nav className="justify-content-end flex-grow-1 pe-3">
                   <NavDropdown title="Mi cuenta" id="navbarScrollingDropdown">
                       {!token ? (
                         <>
@@ -71,7 +60,7 @@ export const Header = () => {
                         </>
                       ) : decoded.userRole === "superadmin" ? (
                         <>
-                          <NavDropdown.Item href="profile">Perfil</NavDropdown.Item>
+                          <NavDropdown.Item href="/profile">Perfil</NavDropdown.Item>
                           <NavDropdown.Item href="/admin/dashboard">Admin</NavDropdown.Item>
                           <NavDropdown.Divider />
                           <NavDropdown.Item onClick={() => logMeOut()}>Cerrar sesión</NavDropdown.Item>
@@ -89,9 +78,6 @@ export const Header = () => {
                         <>
                           <NavDropdown.Item href="/profile">Perfil</NavDropdown.Item>
                           <NavDropdown.Item href="/myAppointments">Mis citas</NavDropdown.Item>
-                          {clientId ?
-                            <NavDropdown.Item href={"/dietplans/" + clientId}>Mis planes</NavDropdown.Item>                        
-                          :null}
                           <NavDropdown.Divider />
                           <NavDropdown.Item onClick={() => logMeOut()}>Log out</NavDropdown.Item>
                         </>
