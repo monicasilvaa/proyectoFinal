@@ -22,7 +22,9 @@ export const deleteUser = async (token, id) => {
             Authorization: 'Bearer ' + token
         }
     }
-    const res = await axios.delete(`${API_BASE_URL}/user/delete/${id}`, config)
+    const res = await axios.delete(`${API_BASE_URL}/api/users/${id}`, config)
+
+    return res.data;
 }
 
 export const userLogin = async (credentials) => {
@@ -30,8 +32,19 @@ export const userLogin = async (credentials) => {
     return res.data.token
 }
 
-export const userCreate = async (userData) => {
+export const registerClient = async (userData) => {
     const res = await axios.post(`${API_BASE_URL}/auth/register`, userData)
+    return res.data
+}
+
+export const userCreate = async (token, userData) => {
+    const config = {
+        headers: {
+            Authorization: "Bearer " + token
+        }
+    }
+
+    const res = await axios.post(`${API_BASE_URL}/api/users`, userData, config)
     return res.data
 }
 
@@ -68,6 +81,28 @@ export const getUserById = async (token, id) => {
     return res.data
 }
 
+export const getClientById = async (token, id) => {
+    const config = {
+        headers: {
+            Authorization: "Bearer " + token
+        }
+    }
+
+    const res = await axios.get(`${API_BASE_URL}/api/users/client/${id}`, config)
+    return res.data
+}
+
+export const getMeals = async (token) => {
+    const config = {
+        headers: {
+            Authorization: "Bearer " + token
+        }
+    }
+
+    const res = await axios.get(`${API_BASE_URL}/api/dietplans/meals`, config)
+    return res.data
+}
+
 export const getUsers = async (token) => {
     const config = {
         headers: {
@@ -76,6 +111,28 @@ export const getUsers = async (token) => {
     }
 
     const res = await axios.get(`${API_BASE_URL}/api/users`, config)
+    return res.data
+}
+
+export const getFoods = async (token) => {
+    const config = {
+        headers: {
+            Authorization: "Bearer " + token
+        }
+    }
+
+    const res = await axios.get(`${API_BASE_URL}/api/foods`, config)
+    return res.data
+}
+
+export const getAvailableRoles = async (token) => {
+    const config = {
+        headers: {
+            Authorization: "Bearer " + token
+        }
+    }
+
+    const res = await axios.get(`${API_BASE_URL}/api/users/roles`, config)
     return res.data
 }
 
@@ -120,6 +177,50 @@ export const getAppointmentsByClient = async (token) => {
     }
 
     const res = await axios.get(`${API_BASE_URL}/api/users/myAppointments`, config)
+    return res.data
+}
+
+export const dietPlanCreate = async (token, dietplanData) => {
+    const config = {
+        headers: {
+            Authorization: "Bearer " + token
+        }
+    }
+
+    const res = await axios.post(`${API_BASE_URL}/api/dietplans`, dietplanData, config)
+    return res.data
+}
+
+export const getDietplans = async (token) => {
+    const config = {
+        headers: {
+            Authorization: "Bearer " + token
+        }
+    }
+
+    const res = await axios.get(`${API_BASE_URL}/api/dietplans`, config)
+    return res.data
+}
+
+export const getDietplanById = async (token, id) => {
+    const config = {
+        headers: {
+            Authorization: "Bearer " + token
+        }
+    }
+
+    const res = await axios.get(`${API_BASE_URL}/api/dietplans/${id}`, config)
+    return res.data
+}
+
+export const getDietplansByClient = async (token, id) => {
+    const config = {
+        headers: {
+            Authorization: "Bearer " + token
+        }
+    }
+
+    const res = await axios.get(`${API_BASE_URL}/api/dietplans/client/${id}`, config)
     return res.data
 }
 
