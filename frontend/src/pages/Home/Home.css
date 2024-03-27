@@ -8,6 +8,22 @@ h1, h2, h3, h4, h5, h6 {
     font-family: 'Oswald', sans-serif;
 }
 
+#primera-cita{
+    background-color:#c49782;
+    color:#FFF;
+    font-family: Raleway;
+    font-size: 0.7rem;
+    font-weight: 500;
+    font-style: normal;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    padding: 2rem 0 0.8rem 0;
+}
+
+.text-home{
+    font-family: 'Raleway';
+}
+
 .home-wrap {
     margin-top: 0;
     padding: 0;
@@ -26,7 +42,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .home-wrap .home-bg-img .home-content h1 {
     font-family: "Rozha One";
-    font-size: 100px;
+    font-size: 3rem;
     line-height: 95%;
     letter-spacing: -0.02em;
     text-transform: capitalize;
@@ -36,15 +52,14 @@ h1, h2, h3, h4, h5, h6 {
 
 .home-wrap .home-bg-img .home-content p {
     font-weight: 300;
-    font-size: 20px;
-    line-height: 200%;
+    font-size: 1rem;
     letter-spacing: 0.02em;
     color: #fff;
 }
 
 .sec-title h1 {
     display: block;
-    font-size: 3rem;
+    font-size: 2rem;
     text-transform: uppercase;
     color: #111;
     margin-bottom: 75px;

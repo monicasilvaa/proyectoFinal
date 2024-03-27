@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { Card } from 'react-bootstrap';
-import { ImageCard } from "../../components/ImageCard/ImageCard";
 import { getCentersList, getDietitiansList } from "../../services/apiCalls";
 
+import dietitian03 from '../../images/dietitian.png';
+import dietitian01 from '../../images/dietitian01.png';
+import dietitian02 from '../../images/dietitian02.png';
+import ubicacion from '../../images/ubicacion.jpeg';
 import "./Home.css";
 
 export const Home = () => {
@@ -13,22 +16,18 @@ export const Home = () => {
     //Se obtiene la lista de dietistas
     getDietitiansList()
     .then((data) => {
-      console.log(data);
       setDietitiansList(data.results);
     })
     .catch((err) => {
-      console.log(err);
   
     });    
 
     //Se obtiene la lista de centros
     getCentersList()
     .then((data) => {
-      console.log(data);
       setCentersList(data.results);
     })
     .catch((err) => {
-      console.log(err);
   
     }); 
   }, []);
@@ -37,6 +36,9 @@ export const Home = () => {
   return (
     
     <>
+      <section id="primera-cita" className="mt-5 text-center">
+          <p class="mb-0">Reserva tu primera cita</p>
+      </section>
       <section id="home" className="home-wrap">
 
         <div className="home-bg-img" >
@@ -46,8 +48,8 @@ export const Home = () => {
                 <div className="row">
                     <div className="col-md-6"></div>
                     <div className="col-md-6">
-                        <h1>Alimentación saludable.</h1>
-                        <p>Las dietistas nutricionistas poseen un conocimiento único y especializado. No solo ayudan a mejorar la alimentación, sino también la salud y el bienestar..</p>
+                        <h1 class="title-home">Alimentación saludable.</h1>
+                        <p class="text-home">Las dietistas nutricionistas poseen un conocimiento único y especializado. No solo ayudan a mejorar la alimentación, sino también la salud y el bienestar..</p>
                     </div>
                 </div>
             </div>
@@ -58,30 +60,26 @@ export const Home = () => {
 
         <div className="container">
 
-            <div className="sec-title">
+            <div  id="dietistas" className="sec-title">
                 <h1>Nuestros dietistas-nutricionistas</h1>
-                <div className="row">
-                {dietitiansList ? (
-                  dietitiansList.map(function(data) {
-                    return (
-                      <ImageCard key={data.photo} imageUrl={data.photo} title={data.username} text={data.email} />
-                    )
-                  })
-                ) : ""}
+                <div className="row">             
+                  <img src={dietitian01} className="my-2 col-sm-4" />
+                  <img src={dietitian02} className="my-2 col-sm-4"/>
+                  <img src={dietitian03} className="my-2 col-sm-4"/>
                 </div>
             </div>
 
-            <div className="sec-title">
+            <div id="centros" className="sec-title pt-4">
                 <h1>Nuestros centros</h1>
                 <div className="row">
                 {centersList ? (
                   centersList.map(function(data) {
                     return (
                       <Card key={data.id} className="col-xl-3 col-lg-6 col-md-6 mb-5">
+                        <Card.Img variant="top" src={ubicacion} />
                         <Card.Body>
                           <Card.Title>{data.address}</Card.Title>
                           <Card.Subtitle className="mb-2 text-muted">{data.phone}</Card.Subtitle>
-                          <Card.Link href="#">Card Link</Card.Link>
                         </Card.Body>
                       </Card>
                     )
