@@ -14,6 +14,7 @@ export const Login = () => {
         email: '',
         password: ''
     })
+    
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const userRdxData = useSelector(userData)
@@ -67,7 +68,6 @@ export const Login = () => {
         navigate("/");
       })
       .catch((err) => {
-        console.log(err);
 
         setShow(true)
       });
@@ -97,7 +97,7 @@ export const Login = () => {
 
   return (
     <div
-      className="loginContenedor"
+      className="loginContenedor mt-5"
     >
         <div className="loginBackdrop"></div>
         <Form className="shadow p-4 bg-white rounded" onSubmit={submitHandler}>
@@ -116,9 +116,9 @@ export const Login = () => {
             >
                 Usuario y/o contraseña incorrectos.
             </Alert>
-            ) : (
-            <div />
-            )}
+            ) : 
+              null
+            }
             <Form.Group className="mb-2" controlId="email">
                 <Form.Label>Usuario</Form.Label>
                 <Form.Control
