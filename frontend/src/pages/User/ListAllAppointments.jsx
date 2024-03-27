@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { Form, Table } from "react-bootstrap";
+import { Alert, Container, Form, Table } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useSelector } from "react-redux";
 import { CustomInput } from "../../components/CustomInput/CustomInput";
-import { Sidebar } from "../../components/Sidebar/Sidebar";
 
 import {
   appointmentCreate,
@@ -30,7 +29,7 @@ export const ListAllAppointments = () => {
   const [servicesData, setServicesData] = useState(false);
   const [centersData, setCentersData] = useState(false);
   const [dietitiansData, setDietitiansData] = useState(false);
-  const [clientsDta, setClientsData] = useState(false);
+  const [clientsData, setClientsData] = useState(false);
 
   const handleClose = () => {
     setShow(false);
@@ -43,18 +42,18 @@ export const ListAllAppointments = () => {
     setShow(true);
     setMessage(false);
     setError(false);
-
+    setId(false);
     if(id){
       setId(id);
 
       getAppointmentById(token,id)
       .then((res) => {
           setAppointmentData(res);    
-      })
-
-      getDietitiansByCenterId(appointmentData.center.id)
-      .then((data) => {
-        setDietitiansData(data);
+      
+          getDietitiansByCenterId(res.center.id)
+          .then((data) => {
+            setDietitiansData(data);
+          })
       })
     }
   }
@@ -96,24 +95,23 @@ export const ListAllAppointments = () => {
     setMessage(false);
     setError(false);
 
+    appointmentData.modified_by = userRdxData.credentials.userData.userId;
+
     if(appointmentId){
         appointmentUpdate(token, appointmentId, appointmentData)
         .then((response) => {
             setMessage(response.message);   
         })
         .catch((err) => {
-          setError(err.message);
+          setError(err.response.data.message);
         });    
     } else {
-       //Se procede con el login
       appointmentCreate(token, appointmentData)
       .then((response) => {
-          if(typeof response.id !== "undefined") {
-            setMessage(response.message);
-          }   
+          setMessage(response.message);
       })
       .catch((err) => {
-        setError(err.message);
+        setError(err.response.data.message);
       });  
     }
 
@@ -133,7 +131,7 @@ export const ListAllAppointments = () => {
     })
 
      //Obtener clientes
-     getClientsList()
+     getClientsList(token)
      .then((res) => {
        setClientsData(res.results);
      })
@@ -146,12 +144,10 @@ export const ListAllAppointments = () => {
 
 
   return (
-    <>
+    <Container>
       <div className="row">
-        <Sidebar />
-        <div className="col col-md-9 col-xl-10 px-4">
           <div className="appointments-btn-container">
-              <Button variant="primary" className="w-auto" onClick={handleShow}>
+              <Button variant="dark" className="w-auto" onClick={() => handleShow(false)}>
                 Nueva cita
               </Button>
             </div>
@@ -184,7 +180,6 @@ export const ListAllAppointments = () => {
             : 
             <p>Actualmente no existen citas</p>
           }
-        </div>
       </div>
 
       <Modal show={show} onHide={handleClose}>
@@ -193,9 +188,15 @@ export const ListAllAppointments = () => {
         </Modal.Header>
         <Modal.Body>
           {error ? 
-              <p className="danger">{error}</p>  
-          :
-              <p className="success">{message}</p>
+            <Alert variant="warning">
+                  {error}
+            </Alert>
+          : null }
+          {message ?
+            <Alert variant="success">
+                  {message}
+            </Alert>
+            :null
           }
           <Form className="shadow p-4 bg-white rounded" onSubmit={submitHandler}>
                 <Form.Select aria-label="Centro" value={appointmentData?.center?.id} name={"center"} onChange={selectHandler}>
@@ -233,19 +234,17 @@ export const ListAllAppointments = () => {
                   }
                 </Form.Select>
 
-                {appointmentData.id ? (
-                  <Form.Select aria-label="Cliente" name={"client"} onChange={inputHandler}>
-                    <option>Cliente</option>
-                    {clientData.length > 0 ? 
-                      clientData.map(function(data) {
-                          return (
-                            <option key={data.id} value={data.id}>{data.user.first_name} {data.user.last_name}</option>
-                          )
-                      })
-                      : "Sin clientes"
-                    }
-                  </Form.Select>
-                ) : null}
+                <Form.Select aria-label="Cliente" name={"client"} value={appointmentData?.client?.id} onChange={inputHandler}>
+                  <option>Cliente</option>
+                  {clientsData.length > 0 ? 
+                    clientsData.map(function(data) {
+                        return (
+                          <option key={data.id} value={data.id}>{data.user.first_name} {data.user.last_name}</option>
+                        )
+                    })
+                    : "Sin clientes"
+                  }
+                </Form.Select>
 
                 <CustomInput type={"datetime-local"} value={appointmentData.appointment_date} name={"appointment_date"} placeholder="Fecha para cita" handler={inputHandler}></CustomInput>
             
@@ -263,6 +262,6 @@ export const ListAllAppointments = () => {
 
         </Modal.Body>
       </Modal>
-    </>
+    </Container>
   )
 }

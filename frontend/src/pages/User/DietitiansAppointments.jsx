@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { Button, Form, Offcanvas, Table } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 import { useSelector } from "react-redux";
-import { CustomInput } from "../../components/CustomInput/CustomInput";
 import {
   appointmentCreate,
   getAppointmentsByClient,
@@ -73,7 +72,7 @@ export const DietitiansAppointments = () => {
     event.preventDefault();
         
     appointmentData.modified_by = userRdxData.credentials.userData.userId;
-    appointmentData.clientUser = userRdxData.credentials.userData.userId;
+    appointmentData.client = userRdxData.credentials.userData.userId;
 
     //Se procede con el login
     appointmentCreate(token, appointmentData)
@@ -103,100 +102,45 @@ export const DietitiansAppointments = () => {
     .then((res) => {
       setServicesData(res.results);
     })
-    //Obtener citas del cliente
+    //Obtener citas del dietista
     getAppointmentsByDietitian(token)
     .then((res) => {
-        setAppointmentsData(res.employeeAppointments);
+        setAppointmentsData(res.appointments);
       })
 
   }, []);
 
 
   return (
-    <>
-      <Offcanvas show={show} onHide={handleClose}>
-        <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Nueva cita</Offcanvas.Title>
-        </Offcanvas.Header>
-        <Offcanvas.Body>
-          {formError ?
-            <p className="danger">No se ha podido crear la cita, tenga en cuenta el horario del centro al hacer la solicitud e inténtelo de nuevo.</p>
-          : ""}
-
-          {formShow? 
-            <Form className="shadow p-4 bg-white rounded" onSubmit={submitHandler}>
-                <Form.Select aria-label="Centro" name={"center_id"} onChange={selectHandler}>
-                  <option>Centro</option>
-                  {centersData.length > 0 ? 
-                    centersData.map(function(data) {
+    <div className="profileDesign pt-5">
+        <div className="miDiv mt-5 col-12 col-sm-8 col-md-6">
+            {appointmentsData?.length > 0 ? 
+                <Table responsive striped bordered hover>
+                  <thead>
+                    <tr>
+                      <th>Cliente</th>
+                      <th>Fecha cita</th>
+                      <th>Centro</th>
+                      <th>Servicio</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {appointmentsData.map(function(data) {
                         return (
-                          <option key={data.id} value={data.id}>{data.address}</option>
+                          <tr key={data.id}>
+                            <td key={data.client.id}>{data.client?.user?.first_name} {data.client?.user?.last_name}</td>
+                            <td key={data.appointment_date}>{data.appointment_date}</td>
+                            <td key={data.center.address}>{data.center.address}</td>
+                            <td key={data.service.name}>{data.service.name}</td>
+                          </tr>            
                         )
-                    })
-                    : "Sin centros"
-                  }
-                </Form.Select>
-                <Form.Select aria-label="Dietista" name={"dietitian_id"} onChange={inputHandler}>
-                  <option>Dietista</option>
-                  {dietitiansData.length > 0 ? 
-                    dietitiansData.map(function(data) {
-                        return (
-                          <option key={data.id} value={data.id}>{data.first_name} {data.last_name}</option>
-                        )
-                    })
-                    : "Sin dietistas"
-                  }
-                </Form.Select>
-
-                <Form.Select aria-label="Servicio" name={"service_id"} onChange={inputHandler}>
-                  <option>Servicio</option>
-                  {servicesData.length > 0 ? 
-                    servicesData.map(function(data) {
-                        return (
-                          <option key={data.id} value={data.id}>{data.name}</option>
-                        )
-                    })
-                    : "Sin servicios"
-                  }
-                </Form.Select>
-
-                <CustomInput type={"datetime-local"} name={"appointment_date"} placeholder="Fecha para cita" handler={inputHandler}></CustomInput>
-            
-                <Button className="w-100" variant="primary" type="submit" >
-                        Solicitar
-                    </Button>
-            </Form>
-            : <p class="success">La solicitud se ha realizado correctamente, en breve contactaremos contigo</p>
-          }
-
-        </Offcanvas.Body>
-      </Offcanvas>
-        {appointmentsData.length > 0 ? 
-            <Table striped bordered hover>
-              <thead>
-                <tr>
-                  <th>Cliente</th>
-                  <th>Fecha cita</th>
-                  <th>Centro</th>
-                  <th>Servicio</th>
-                </tr>
-              </thead>
-              <tbody>
-                {appointmentsData.map(function(data) {
-                    return (
-                      <tr key={data.id}>
-                        <td key={data.clientUser.first_name}>{data.clientUser.first_name} {data.clientUser.last_name}</td>
-                        <td key={data.appointment_date}>{data.appointment_date}</td>
-                        <td key={data.center.address}>{data.center.address}</td>
-                        <td key={data.service.name}>{data.service.name}</td>
-                      </tr>            
-                    )
-                })}
-                </tbody>
-              </Table>
-         : 
-         <p>Actualmente no tienes citas</p>
-        }
-    </>
+                    })}
+                    </tbody>
+                  </Table>
+            : 
+            <p>Actualmente no tienes citas</p>
+            }
+        </div>
+      </div>
   )
 }
