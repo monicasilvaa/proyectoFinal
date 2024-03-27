@@ -1,4 +1,19 @@
-# Sistema de Gestión de Citas para Estudio de Tatuajes - Frontend
+# Sistema de Gestión de Citas para Software Nutricional
+
+<details>
+  <summary>Contenido 📝</summary>
+  <ol>
+    <li><a href="#descripcion-del-proyecto">Descripción del Proyecto</a></li>
+    <li><a href="#funcionalidades-principales">Funcionalidades Principales</a></li>
+    <li><a href="#funcionalidades-adicionales">Funcionalidades Adicionales</a></li>
+    <li><a href="#tecnologías-utilizadas">Tecnologías Utilizadas</a></li>
+    <li><a href="#estructura-del-repositorio">Estructura del Repositorio</a></li>
+    <li><a href="#instrucciones-para-instalación-local">Instrucciones para Instalación Local</a></li>
+    <li><a href="#urls">URLs</a></li>
+    <li><a href="#objetivo">Objetivo</a></li>
+    <li><a href="#sobre-el-proyecto">Sobre el proyecto</a></li>
+  </ol>
+</details>
 
 ## Descripción del Proyecto
 
@@ -11,17 +26,33 @@ Este proyecto se centra en el desarrollo del frontend para un sistema de gestió
    - Inicio de sesión de usuarios.
    - Perfil de usuario.
    - Modificación de datos del perfil.
+   - Ver plan nutricional
+
+2. **Dietistas**
+   - Registro de usuarios.
+   - Inicio de sesión de usuarios.
+   - Perfil de usuario.
+   - Modificación de datos del perfil.
+   - Crear y ver plan nutricional
+
+3. **Admin**
+   - Registro de nuevos usuarios con asignación de rol.
+   - Inicio de sesión de usuarios.
+   - Perfil de usuario.
+   - Modificación de datos del perfil.
 
 2. **Citas**
    - Creación de citas.
    - Visualización de todas las citas como cliente (solo las propias).
    - Visualización de todas las citas existentes con el dietista (role dietista).
+   - Visualización, creación y modificación de citas (role admin).
 
 
 ### Funcionalidades Adicionales (Extra)
 
 1. **Detalles de Citas (Extra)**
    - Visualización detallada de una cita.
+   - Visualización detallada de un plan nutricional.
 
 3. **Crear cita**
    - Escoger el tipo de servicio en las citas.
@@ -50,6 +81,7 @@ Este proyecto se centra en el desarrollo del frontend para un sistema de gestió
 - **Creación de Citas (Clientes)**: `/myAppointments`
 - **Visualización de Citas como Cliente**: `/myAppointments`
 - **Visualización de Citas con Dietista**: `/dietitianAppointments`
+- **Visualización de los planes de un cliente**: `/dietplans/:clientId`
 
 ## Objetivo
 
@@ -57,5 +89,7 @@ Este proyecto tiene como objetivo proporcionar un frontend eficiente para el sis
 
 ## Sobre el Proyecto
 
-Este es el quinto proyecto a realizar para el Bootcamp Geekshubs Academy, destinado a desarrollar las habilidades en el manejo de tecnologías frontend y buenas prácticas de desarrollo.
+Este es el proyecto final a realizar para el Bootcamp Geekshubs Academy, destinado a desarrollar las habilidades en el manejo de tecnologías frontend y buenas prácticas de desarrollo.
+
+
 
