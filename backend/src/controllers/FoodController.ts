@@ -2,52 +2,16 @@ import { Request, Response } from "express";
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
 import { AppDataSource } from "../database/data-source";
-import { Client } from "../models/Client";
 import { DietPlan } from "../models/DietPlan";
-import { Dietitian } from "../models/Dietitian";
+import { Food } from "../models/Food";
 import { Meal } from "../models/Meal";
-import { PlanDetail } from "../models/PlanDetail";
 import { Controller } from "./Controller";
 
 // -----------------------------------------------------------------------------
 
-export class DietplanController implements Controller {
-   async create(req: Request, res: Response): Promise<void | Response<any>> {
-      try {
-         const data = req.body;
-
-         const dietPlanRepository = AppDataSource.getRepository(DietPlan);
-         const clientRepository = AppDataSource.getRepository(Client);
-         const dietitianRepository = AppDataSource.getRepository(Dietitian);
-
-         data.client = await clientRepository.findOneBy({
-            id: data.client,
-         });
-         
-         data.dietitian = await dietitianRepository.findOneBy({
-            id: data.dietitian,
-         });
-
-         //TODO: actualizar total_kcal cuando se inserten los datos finales de alimentos
-         data.total_kcal = 0;
-
-         const newDietPlan = await dietPlanRepository.save(data);
-
-         newDietPlan.planDetails?.map((detail: { dietPlan: any; }) => {
-            detail.dietPlan = newDietPlan;
-         });
-
-
-         await dietPlanRepository.manager.save(PlanDetail, newDietPlan.planDetails);
-         
-         res.status(201).json({
-            message: "DietPlan created successfully",
-         });
-      } catch (error) {
-         res.status(500).json({
-            message: "Error while creating dietPlan" + error,
-         });
-      }
+export class FoodController implements Controller {
+   create(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void | Response<any, Record<string, any>>> {
+      throw new Error("Method not implemented.");
    }
    update(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>): Promise<void | Response<any, Record<string, any>>> {
       throw new Error("Method not implemented.");
@@ -57,33 +21,35 @@ export class DietplanController implements Controller {
    }
    async getAll(req: Request, res: Response): Promise<void | Response<any>> {
       try {
-         const dietplanRepository = AppDataSource.getRepository(DietPlan);
+         const foodRepository = AppDataSource.getRepository(Food);
 
          let { page, skip } = req.query;
 
          let currentPage = page ? +page : 1;
          let itemsPerPage = skip ? +skip : 10;
 
-         const [allDietplans, count] = await dietplanRepository.findAndCount({
+         const [allFoods, count] = await foodRepository.findAndCount({
             skip: (currentPage - 1) * itemsPerPage,
             take: itemsPerPage,
+            relations: ['foodAttributes']
             
          });
          res.status(200).json({
             count,
             skip: itemsPerPage,
             page: currentPage,
-            results: allDietplans,
+            results: allFoods,
          });
       } catch (error) {
          res.status(500).json({
-            message: "Error while getting dietplans",
+            message: "Error while getting foods",
          });
       }
    }
 
    async getMeals(req: Request, res: Response): Promise<void | Response<any>> {
       try {
+         console.log("MEALS");
          const mealRepository = AppDataSource.getRepository(Meal);
 
          let { page, skip } = req.query;
@@ -113,12 +79,9 @@ export class DietplanController implements Controller {
       try {
          const id = +req.params.id;
 
-         const dietplanRepository = AppDataSource.getRepository(DietPlan);
-         const dietplan = await dietplanRepository.findOne({
-            where: {
-               id: id
-            },
-            relations: ['planDetails', 'planDetails.meal', 'planDetails.food', 'planDetails.food.foodAttributes']
+         const foodRepository = AppDataSource.getRepository(DietPlan);
+         const dietplan = await foodRepository.findOneBy({
+            id: id,
          });
 
          if (!dietplan) {
@@ -139,14 +102,14 @@ export class DietplanController implements Controller {
       try {
          const id = +req.params.id;
 
-         const dietPlanRepository = AppDataSource.getRepository(DietPlan);
+         const foodRepository = AppDataSource.getRepository(DietPlan);
 
          let { page, skip } = req.query;
 
          let currentPage = page ? +page : 1;
          let itemsPerPage = skip ? +skip : 10;
 
-         const [allDietplans, count] = await dietPlanRepository.findAndCount({
+         const [allDietplans, count] = await foodRepository.findAndCount({
             skip: (currentPage - 1) * itemsPerPage,
             take: itemsPerPage,
             where: {

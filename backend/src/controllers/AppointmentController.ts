@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import { LessThanOrEqual, MoreThanOrEqual } from "typeorm";
+import { LessThanOrEqual, MoreThanOrEqual, Not } from "typeorm";
 import { DaysOfWeek } from "../constants/BusinessHours";
 import { AppDataSource } from "../database/data-source";
 import { Appointment } from "../models/Appointment";
 import { BusinessHour } from "../models/BusinessHour";
 import { Center } from "../models/Center";
+import { Client } from "../models/Client";
 import { Dietitian } from "../models/Dietitian";
-import { User } from "../models/User";
 import { Controller } from "./Controller";
 
 // -----------------------------------------------------------------------------
@@ -77,7 +77,7 @@ export class AppointmentController implements Controller {
 
          const appointmentRepository = AppDataSource.getRepository(Appointment);
          const centerRepository = AppDataSource.getRepository(Center);
-         const userRepository = AppDataSource.getRepository(User);
+         const clientRepository = AppDataSource.getRepository(Client);
          const dietitianRepository = AppDataSource.getRepository(Dietitian);
          const businessHourRepository = AppDataSource.getRepository(BusinessHour);
 
@@ -85,7 +85,7 @@ export class AppointmentController implements Controller {
 
          //Se obtiene el Center usando el data.center (id de centro) recibido en la petición
          data.center = await centerRepository.findOneBy({
-            id: data.center
+            id: data.center.id || data.center
          }) as Center;
 
          const appointmentTime = data.appointment_date.getHours() + ":" + data.appointment_date.getMinutes() + ":00";
@@ -107,16 +107,16 @@ export class AppointmentController implements Controller {
                message: "Appointment time not available",
             });
          }
-         
-         data.clientUser = await userRepository.findOne({
-            where: {id: data.clientUser},
-            relations: ['client']
-         }) as User;
 
-         data.client = data.clientUser.client
+         data.clientUser = await clientRepository.findOne({
+            where: {id: data.client},
+            relations: ['user']
+         }) as Client;
+
+         data.client = data.clientUser
 
          data.dietitian = await dietitianRepository.findOneBy({
-            id: data.dietitian_id
+            id: data.dietitian.id || data.dietitian
          }) as Dietitian;
 
          //Se verifica si el dietitian recibido tiene alguna cita para la fecha recibida
@@ -137,13 +137,15 @@ export class AppointmentController implements Controller {
             });
          }
 
-         const newAppointment = await appointmentRepository.save(data);
-         res.status(201).json(newAppointment);
-      } catch (error) {
-         res.status(500).json({
-            message: "Error while creating appointment" + error,
-         });
-      }
+         await appointmentRepository.save(data);
+            res.status(201).json({
+               message: "Appointment created successfully",
+            });      
+         } catch (error) {
+            res.status(500).json({
+               message: "Error while creating appointment" + error,
+            });
+         }
    }
 
    async update(req: Request, res: Response): Promise<void | Response<any>> {
@@ -169,7 +171,7 @@ export class AppointmentController implements Controller {
 
          //Se obtiene el Center usando el data.center (id de centro) recibido en la petición
          data.center = await centerRepository.findOneBy({
-            id: data.center
+            id: data.center.id || data.center
          }) as Center;
 
          if (data.appointment_date) {
@@ -197,7 +199,7 @@ export class AppointmentController implements Controller {
          }
          
          data.dietitian = await dietitianRepository.findOneBy({
-            id: data.dietitian_id
+            id: data.dietitian.id || data.dietitian
          }) as Dietitian;
 
          //Se verifica si el dietitian recibido tiene alguna cita para la fecha recibida
@@ -207,7 +209,8 @@ export class AppointmentController implements Controller {
             },
             where: {
                dietitian: data.dietitian,
-               appointment_date: data.appointment_date
+               appointment_date: data.appointment_date,
+               id: Not(id)
             }
          }) as Appointment[];
 
