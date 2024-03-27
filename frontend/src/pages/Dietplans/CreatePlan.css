@@ -1,0 +1,32 @@
+.search-group{
+    position:relative;
+}
+
+
+.results-lists{
+    position:absolute;
+    top:100%;
+    background-color:#FFF;
+    z-index:99;
+}
+
+.results-lists li{
+    z-index: 999;
+}
+
+.form-select{
+    border:0;
+    padding:0;
+    margin:1rem 0;
+}
+.box-title{
+    color:#FFF;
+    font-size:1rem;
+    background-color:rgb(100, 205, 154);
+    text-align: center;
+    padding:.5rem;
+}
+
+.box-attrib{
+    border:1px solid rgb(100, 205, 154);
+}
