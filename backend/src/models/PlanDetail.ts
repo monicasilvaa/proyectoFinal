@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { DietPlan } from "./DietPlan";
 import { Food } from "./Food";
 import { Meal } from "./Meal";
@@ -19,4 +19,7 @@ export class PlanDetail {
     @ManyToOne(() => Food, (food) => food.planDetails)
     @JoinColumn({ name: "food_id" })
     food?: Food;
+
+    @Column()
+    quantity!: number;
 }

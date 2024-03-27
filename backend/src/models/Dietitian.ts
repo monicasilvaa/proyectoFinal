@@ -11,7 +11,10 @@ import { User } from "./User";
   
     @Column()
     specialization!: string;
-    @OneToOne(() => User, (user) => user.dietitian)
+
+    @OneToOne(() => User, (user) => user.dietitian, {
+      onDelete: "CASCADE",
+    })
     @JoinColumn({ name: "user_id" })
     user!: User;
 

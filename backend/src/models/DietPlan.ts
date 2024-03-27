@@ -9,15 +9,6 @@ export class DietPlan {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column({ type: "int" })
-    client_id!: number;
-
-    @Column({ type: "int" })
-    dietitian_id!: number;
-
-    @Column({ type: "int" })
-    appointment_id?: number;
-
     @Column({ type: "decimal" })
     total_kcal!: number;
 

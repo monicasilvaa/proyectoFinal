@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Appointment } from "./Appointment";
 import { DietPlan } from "./DietPlan";
 import { User } from "./User";
@@ -8,7 +8,7 @@ export class Client {
   @PrimaryGeneratedColumn()
   id?: number;
 
-  @ManyToOne(() => User, (user) => user.client, {
+  @OneToOne(() => User, (user) => user.client, {
     onDelete: "CASCADE",
   })
   @JoinColumn({ name: "user_id" })
@@ -31,9 +31,6 @@ export class Client {
 
   @Column()
   intolerance!: string;
-
-  @OneToOne(() => DietPlan, (dietPlan) => dietPlan.client)
-  dietPlan?: DietPlan;
 
   @OneToMany(() => Appointment, (appointment) => appointment.client)
   appointments?: Appointment[];
