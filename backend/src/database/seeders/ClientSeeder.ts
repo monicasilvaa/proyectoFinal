@@ -37,7 +37,7 @@ export const seedClientsWithUser = async (count: number) => {
 
    // Generar usuarios con roles de profesor
    const users = await seedUsersWithRole({
-      role: UserRoles.DIETITIAN,
+      role: UserRoles.CLIENT,
       count,
    });
 

@@ -44,7 +44,7 @@ export const seedDietitiansWithUser = async (count: number) => {
    // Generar profesores
    const dietitians = dietitianFactory.createMany(count);
 
-   // Asignar usuario a cada profesor
+   // Asignar usuario a cada dietista
    dietitians.forEach((dietitian, index) => {
       dietitian.user = users[index];
    });

@@ -4,6 +4,7 @@ import { Food } from "../../models/Food";
 import { Meal } from "../../models/Meal";
 import { PlanDetail } from "../../models/PlanDetail";
 import { AppDataSource } from "../data-source";
+import { PlanDetailFactory } from "../factories/PlanDetailFactory";
 
 // -----------------------------------------------------------------------------
 
@@ -38,13 +39,18 @@ export const planDetailSeeder = async () => {
                 return false;
             }
 
-            const planDetail = new PlanDetail();
-            
-            planDetail.dietPlan = dietPlan;
-            planDetail.food = food;
-            planDetail.meal = value;
+            const planDetailFactory = new PlanDetailFactory(planDetailRepository);
+
+            const detail = await Promise.all(planDetailFactory.createMany(1).map(async (planDetail, index) => {
+                  planDetail.dietPlan = dietPlan;
+                  planDetail.food = food;
+                  planDetail.meal = value;
+              
+                  return planDetail;
+                })
+            );
       
-            planDetailArray = planDetailArray.concat(planDetail);
+            planDetailArray = planDetailArray.concat(detail);
         };
      }
 

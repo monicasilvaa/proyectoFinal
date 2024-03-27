@@ -25,6 +25,10 @@ export class CreatePlanDetailsTable1704367341791 implements MigrationInterface {
                     name: "food_id",
                     type: "int",
                 },
+                {
+                    name: "quantity",
+                    type: "int",
+                }
             ],
             foreignKeys: [
                 {

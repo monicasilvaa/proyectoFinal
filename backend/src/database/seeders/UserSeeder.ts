@@ -7,9 +7,6 @@ import { UserFactory } from "../factories/UserFactory";
 export const userSeeder = async () => {
   try {
     await AppDataSource.initialize();
-
-    const userRepository = AppDataSource.getRepository(User);
-
     const count = 3;
 
  // / Llamar a la función para sembrar usuarios con roles de superadmin
